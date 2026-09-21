@@ -10,13 +10,14 @@ body {
 /* Level 1 */
 .kartu-flex {
   display: flex;
-  justify-content: space-between; 
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .kartu {
-  background-color: lab(74.3% 1.76 52.18 / 0.408);
+  background-color: #eef7ee;
   padding: 1rem;
-  border: 1px solid #c17d2abb;
+  border: 1px solid #2c6e49;
 }
 
 /* Level 2 */
@@ -25,24 +26,32 @@ body {
 
 /* Level 4 */
 .tata-letak {
+  display: flex;
 }
 
 .sidebar {
   background-color: #f0f0f0;
   padding: 1rem;
+  flex: 0 0 250px;
 }
 
 .konten {
   background-color: #ffffff;
   padding: 1rem;
+  flex: 1;
 }
 
 /* Level 5 */
 .info-kontak {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Level 6 */
 .kisi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .kartu-grid {
@@ -54,6 +63,9 @@ body {
 /* Level 7 */
 
 /* Level 8 */
+.unggulan {
+  grid-column: span 2;
+}
 
 /* Level 9
 
