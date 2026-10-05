@@ -15,66 +15,112 @@ export const katalog = [
   { judul: 'Ayat-Ayat Cinta', penulis: 'Habiburrahman El Shirazy', harga: 0, tersedia: false },
 ];
 
-// Level 1 — ada bug: harga 0 malah menampilkan "Rp" tanpa angka sama sekali.
+// Level 1 — harga 0 harus tampil "Rp 0".
 export function formatRupiah(angka) {
-  if (!angka == null) return 'Rp 0';
   return 'Rp ' + angka.toLocaleString('id-ID');
 }
 
-// Level 2 — TODO: kembalikan buku yang `tersedia` saja, TANPA mengubah
-// array `daftar` yang asli (jangan pakai .sort/.splice/push ke `daftar`).
+// Level 2 — kembalikan buku yang `tersedia` saja tanpa mengubah `daftar`.
 export function saringTersedia(daftar) {
   return daftar.filter((buku) => buku.tersedia);
 }
 
-// Level 3 — TODO: ambil elemen #judul-pengumuman dengan querySelector,
-// lalu ubah teksnya menjadi HURUF BESAR SEMUA.
+// Level 3 — ubah teks #judul-pengumuman menjadi HURUF BESAR.
 export function sorotJudulPengumuman() {
-  // tulis di sini
+  const judul = document.querySelector('#judul-pengumuman');
+  judul.textContent = judul.textContent.toUpperCase();
 }
 
-// Level 4 — TODO: ambil SEMUA <li> di #daftar-pengumuman dengan
-// querySelectorAll. Untuk setiap <li> yang teksnya mengandung kata "tutup"
-// (tanpa peduli huruf besar/kecil), tambahkan prefix "⚠ " di depan teksnya.
-// Jangan tambahkan prefix dua kali kalau fungsi ini terpanggil berulang.
+// Level 4 — beri prefix "⚠ " pada <li> yang mengandung "tutup",
+// tanpa menumpuk prefix kalau dipanggil berulang.
 export function tandaiPengumumanPenting() {
-  // tulis di sini
+  const items = document.querySelectorAll('#daftar-pengumuman li');
+  items.forEach((li) => {
+    const teks = li.textContent;
+    const mengandungTutup = teks.toLowerCase().includes('tutup');
+    const sudahDiTandai = teks.startsWith('⚠ ');
+    if (mengandungTutup && !sudahDiTandai) {
+      li.textContent = '⚠ ' + teks;
+    }
+  });
 }
 
-// Level 5 — TODO: buat SATU elemen <article> untuk satu buku, memakai
-// document.createElement dan textContent (BUKAN innerHTML — aturan ini
-// berlaku untuk seluruh file, bukan cuma fungsi ini).
-// Struktur minimal: <article><h3>judul</h3><p>penulis</p><p>harga</p></article>
-// Kembalikan elemen itu (jangan langsung ditempel ke halaman di sini).
+// Level 5 — buat satu elemen <article> untuk satu buku dengan
+// document.createElement dan textContent.
+// Struktur: <article><h3>judul</h3><p>penulis</p><p>harga</p></article>
+// Elemen dikembalikan, tidak langsung ditempel ke halaman.
 export function buatKartuBuku(buku) {
-  return null;
+  const kartu = document.createElement('article');
+
+  const judul = document.createElement('h3');
+  judul.textContent = buku.judul;
+
+  const penulis = document.createElement('p');
+  penulis.textContent = buku.penulis;
+
+  const harga = document.createElement('p');
+  harga.textContent = formatRupiah(buku.harga);
+
+  kartu.append(judul, penulis, harga);
+  return kartu;
 }
 
-// Level 6 & 10 — TODO: kosongkan #katalog, lalu render ulang dari `data`.
-// Fungsi ini HARUS dipakai untuk semua kondisi tampilan katalog: daftar
-// penuh, hasil pencarian, maupun daftar kosong (Level 9 dan Level 10 sama-
-// sama lewat sini, jangan bikin fungsi render terpisah).
-// - Perbarui #ringkasan, misalnya "5 buku ditemukan".
-// - Kalau `data` kosong, tampilkan pesan di dalam #katalog, misalnya
-//   "Tidak ada buku yang cocok." — jangan biarkan #katalog kosong melompong.
-// - Setiap kartu yang ditampilkan harus bisa diklik (lihat Level 7).
+// Level 6 & 10 — kosongkan #katalog lalu render ulang dari `data`.
+// Dipakai untuk semua kondisi: daftar penuh, hasil pencarian, dan kosong.
 export function render(data) {
-  // tulis di sini
+  const wadah = document.querySelector('#katalog');
+  const ringkasan = document.querySelector('#ringkasan');
+
+  wadah.replaceChildren();
+  ringkasan.textContent = data.length + ' buku ditemukan';
+
+  if (data.length === 0) {
+    const pesan = document.createElement('p');
+    pesan.textContent = 'Tidak ada buku yang cocok.';
+    wadah.append(pesan);
+    return;
+  }
+
+  for (const buku of data) {
+    const kartu = buatKartuBuku(buku);
+    // Closure: handler ini "mengingat" `buku` milik iterasi ini.
+    kartu.addEventListener('click', () => tampilkanDetail(buku));
+    wadah.append(kartu);
+  }
 }
 
-// Level 7 — dipanggil saat sebuah kartu diklik. TODO: tampilkan judul,
-// penulis, dan harga buku itu di #panel-detail (textContent, bukan innerHTML).
+// Level 7 — dipanggil saat sebuah kartu diklik. Tampilkan judul,
+// penulis, dan harga buku itu di #panel-detail dengan textContent.
 function tampilkanDetail(buku) {
-  // tulis di sini
+  const panel = document.querySelector('#panel-detail');
+
+  const judul = document.createElement('h3');
+  judul.textContent = buku.judul;
+
+  const penulis = document.createElement('p');
+  penulis.textContent = buku.penulis;
+
+  const harga = document.createElement('p');
+  harga.textContent = formatRupiah(buku.harga);
+
+  panel.replaceChildren(judul, penulis, harga);
 }
 
-// Level 8 & 9 — TODO: pasang event listener 'submit' pada #form-cari.
+// Level 8 & 9 — pasang listener 'submit' pada #form-cari.
 // - Level 8: cegah reload halaman (preventDefault).
-// - Level 9: ambil nilai #input-cari, saring `katalog` yang judulnya
-//   mengandung kata itu (tanpa peduli huruf besar/kecil), lalu panggil
-//   render(hasil) — bukan menulis ulang kode tampilan di sini.
+// - Level 9: saring `katalog` berdasarkan judul, lalu panggil render(hasil).
 export function pasangFormCari() {
-  // tulis di sini
+  const form = document.querySelector('#form-cari');
+  const input = document.querySelector('#input-cari');
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const kata = input.value.trim().toLowerCase();
+    const hasil = katalog.filter((buku) =>
+      buku.judul.toLowerCase().includes(kata)
+    );
+    render(hasil);
+  });
 }
 
 // Bootstrap halaman — jangan hapus, ini yang membuat halaman "hidup" saat
